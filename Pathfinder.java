@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
  */
 public class Pathfinder {
     private HashMap<Integer, Node> inputMap;
+    private static final int FAILURE = -1;
 
     public static void main(String[] args) {
         new Pathfinder();
@@ -70,7 +71,7 @@ public class Pathfinder {
             }
         }
 
-        return 0;
+        return FAILURE;
     }
 
     private ArrayList<Node> getNeighbors(Node currentNode, int[] pMap, int width) {
