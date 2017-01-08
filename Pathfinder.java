@@ -79,13 +79,17 @@ public class Pathfinder {
         boolean isNextToLeftWall = currentNode.getX() == 0;
         boolean isNextToRightWall = currentNode.getX() == width - 1;
         int currentNodeIndex = currentNode.getX() + currentNode.getY() * width;
-        if ((currentNodeIndex + 1) >= 0 && (currentNodeIndex + 1) < mapSize && !isNextToRightWall)
+        if ((currentNodeIndex + 1) >= 0 && (currentNodeIndex + 1) < mapSize
+                && !isNextToRightWall && pMap[currentNodeIndex + 1] != 0)
             neighbors.add(inputMap.get(currentNodeIndex + 1));
-        if ((currentNodeIndex - 1) >= 0 && (currentNodeIndex - 1) < mapSize && !isNextToLeftWall)
+        if ((currentNodeIndex - 1) >= 0 && (currentNodeIndex - 1) < mapSize
+                && !isNextToLeftWall && pMap[currentNodeIndex - 1] != 0)
             neighbors.add(inputMap.get(currentNodeIndex - 1));
-        if ((currentNodeIndex + width) >= 0 && (currentNodeIndex + width) < mapSize)
+        if ((currentNodeIndex + width) >= 0 && (currentNodeIndex + width) < mapSize
+                && pMap[currentNodeIndex + width] != 0)
             neighbors.add(inputMap.get(currentNodeIndex + width));
-        if ((currentNodeIndex - width) >= 0 && (currentNodeIndex - width) < mapSize)
+        if ((currentNodeIndex - width) >= 0 && (currentNodeIndex - width) < mapSize
+                && pMap[currentNodeIndex - width] != 0)
             neighbors.add(inputMap.get(currentNodeIndex - width));
         return neighbors;
     }
@@ -115,6 +119,8 @@ public class Pathfinder {
             for (int xCoordinate = 0; xCoordinate < nMapWidth; xCoordinate++) {
                 if (pathIndices.contains(yCoordinate * nMapWidth + xCoordinate))
                     System.err.print("x");
+                else if (pMap[yCoordinate * nMapWidth + xCoordinate] == 0)
+                    System.err.print("0");
                 else System.err.print("-");
             }
             System.err.println("");
