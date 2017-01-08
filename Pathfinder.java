@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Created by martinpettersson on 07/01/17.
@@ -13,7 +15,7 @@ public class Pathfinder {
     public Pathfinder() {
         int[] pMap = {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1};
         int[] pOutBuffer = new int[12];
-        findPath(0, 0, 2, 2, pMap, 4, 3, pOutBuffer, 12);
+        findPath(0, 0, 1, 2, pMap, 4, 3, pOutBuffer, 12);
     }
 
     private int findPath(int nStartX, int nStartY, int nTargetX, int nTargetY,
@@ -48,8 +50,12 @@ public class Pathfinder {
 
             Node currentNode = Collections.min(openSet);
             System.err.println(currentNode.getX() + " " + currentNode.getY());
-            if (currentNode.isEqual(goalNode))
-                return reconstructPath(cameFrom, currentNode);
+            if (currentNode.isEqual(goalNode)) {
+                ArrayList<Node> totalPath = reconstructPath(cameFrom, currentNode);
+                outputMapAndPath(pMap, totalPath, nMapWidth, nMapHeight);
+                return totalPath.size();
+            }
+
             openSet.remove(currentNode);
             closedSet.add(currentNode);
             ArrayList<Node> neighborsOfCurrent = getNeighbors(currentNode, pMap, nMapWidth);
@@ -87,7 +93,7 @@ public class Pathfinder {
         return neighbors;
     }
 
-    private int reconstructPath(HashMap<Node, Node> cameFrom, Node currentNode) {
+    private ArrayList<Node> reconstructPath(HashMap<Node, Node> cameFrom, Node currentNode) {
         ArrayList<Node> totalPath = new ArrayList<>();
         totalPath.add(currentNode);
         while (cameFrom.keySet().contains(currentNode)) {
@@ -98,7 +104,25 @@ public class Pathfinder {
         totalPath.stream().forEach(
                 n -> System.err.println(n.getX() + " " + n.getY() + ", " + n.inputIndex(4)));
         System.err.println(totalPath.size());
-        return 0;
+        return totalPath;
+    }
+
+    private void outputMapAndPath(int[] pMap, ArrayList<Node> totalPath, int nMapWidth, int nMapHeight) {
+
+        List<Integer> pathIndices = totalPath
+                .stream()
+                .map(n -> n.inputIndex(nMapWidth))
+                .collect(Collectors.toList());
+        System.err.println("");
+
+        for (int yCoordinate = nMapHeight - 1; yCoordinate >= 0; yCoordinate--) {
+            for (int xCoordinate = 0; xCoordinate < nMapWidth; xCoordinate++) {
+                if (pathIndices.contains(yCoordinate * nMapWidth + xCoordinate))
+                    System.err.print("x");
+                else System.err.print("-");
+            }
+            System.err.println("");
+        }
     }
 }
 
