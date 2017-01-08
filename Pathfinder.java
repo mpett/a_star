@@ -20,7 +20,6 @@ public class Pathfinder {
 
     private int findPath(int nStartX, int nStartY, int nTargetX, int nTargetY,
                          int[] pMap, int nMapWidth, int nMapHeight, int[] pOutBuffer, int nOutBufferSize) {
-
         // Build hash map from input vector
         inputMap = new HashMap<Integer, Node>();
         for (int yCoordinate = 0; yCoordinate < nMapHeight; yCoordinate++) {
@@ -37,7 +36,6 @@ public class Pathfinder {
         System.err.println(n1.equals(n2));
         System.err.println("---- test equals");
         Node startNode = new Node(nStartX, nStartY);
-
         HashSet<Node> closedSet = new HashSet<>();
         HashSet<Node> openSet = new HashSet<>();
         openSet.add(startNode);
@@ -47,7 +45,6 @@ public class Pathfinder {
         startNode.setfScore(startNode.heuristicDistanceFunction(goalNode));
 
         while (!openSet.isEmpty()) {
-
             Node currentNode = Collections.min(openSet);
             System.err.println(currentNode.getX() + " " + currentNode.getY());
             if (currentNode.isEqual(goalNode)) {
@@ -108,7 +105,6 @@ public class Pathfinder {
     }
 
     private void outputMapAndPath(int[] pMap, ArrayList<Node> totalPath, int nMapWidth, int nMapHeight) {
-
         List<Integer> pathIndices = totalPath
                 .stream()
                 .map(n -> n.inputIndex(nMapWidth))
