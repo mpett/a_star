@@ -14,9 +14,21 @@ public class Pathfinder {
     }
 
     public Pathfinder() {
-        int[] pMap = {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1};
-        int[] pOutBuffer = new int[12];
-        findPath(0, 0, 1, 2, pMap, 4, 3, pOutBuffer, 12);
+        int[] pMap = {
+                1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1,
+                1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1
+        };
+        int[] pOutBuffer = new int[pMap.length];
+        findPath(0, 0, 10, 10, pMap, 12, 11, pOutBuffer, pMap.length);
     }
 
     private int findPath(int nStartX, int nStartY, int nTargetX, int nTargetY,
