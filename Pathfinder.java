@@ -34,7 +34,7 @@ public class Pathfinder {
     private int findPath(int nStartX, int nStartY, int nTargetX, int nTargetY,
                          int[] pMap, int nMapWidth, int nMapHeight, int[] pOutBuffer, int nOutBufferSize) {
         // Build hash map from input vector
-        inputMap = new HashMap<Integer, Node>();
+        inputMap = new HashMap<>();
         for (int yCoordinate = 0; yCoordinate < nMapHeight; yCoordinate++) {
             for (int xCoordinate = 0; xCoordinate < nMapWidth; xCoordinate++) {
                 inputMap.put(
@@ -61,7 +61,7 @@ public class Pathfinder {
             Node currentNode = Collections.min(openSet);
             System.err.println(currentNode.getX() + " " + currentNode.getY());
             if (currentNode.isEqual(goalNode)) {
-                ArrayList<Node> totalPath = reconstructPath(cameFrom, currentNode);
+                ArrayList<Node> totalPath = reconstructPath(cameFrom, currentNode, nMapWidth);
                 outputMapAndPath(pMap, totalPath, nMapWidth, nMapHeight);
                 return totalPath.size();
             }
@@ -107,7 +107,7 @@ public class Pathfinder {
         return neighbors;
     }
 
-    private ArrayList<Node> reconstructPath(HashMap<Node, Node> cameFrom, Node currentNode) {
+    private ArrayList<Node> reconstructPath(HashMap<Node, Node> cameFrom, Node currentNode, int width) {
         ArrayList<Node> totalPath = new ArrayList<>();
         totalPath.add(currentNode);
         while (cameFrom.keySet().contains(currentNode)) {
@@ -116,7 +116,7 @@ public class Pathfinder {
         }
 
         totalPath.stream().forEach(
-                n -> System.err.println(n.getX() + " " + n.getY() + ", " + n.inputIndex(4)));
+                n -> System.err.println(n.getX() + " " + n.getY() + ", " + n.inputIndex(width)));
         System.err.println(totalPath.size());
         return totalPath;
     }
