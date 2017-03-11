@@ -34,13 +34,26 @@ struct Node {
         return this->fScore > comparableNode.fScore;
     }
     
+    bool operator==(const Node& anotherNode) const {
+        if (this -> xPosition == anotherNode.xPosition
+            && this -> yPosition == anotherNode.yPosition
+            && this -> fScore == anotherNode.fScore
+            && this -> gScore == anotherNode.gScore) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     int inputIndex(int width) {
         return yPosition * width + xPosition;
     }
     
     bool isEqual(const Node & anotherNode) {
         if (this -> xPosition == anotherNode.xPosition
-            && this -> yPosition == anotherNode.yPosition) {
+            && this -> yPosition == anotherNode.yPosition
+            && this -> fScore == anotherNode.fScore
+            && this -> gScore == anotherNode.gScore) {
             return true;
         } else {
             return false;
@@ -114,10 +127,20 @@ vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
     return neighbors;
 }
 
+bool setContainsNode(const set<Node>& nodeSet, const Node& nodeCandidate) {
+    for (auto nodeElement : nodeSet) {
+        if (nodeElement.isEqual(nodeCandidate)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
              int* pOutBuffer, const int nOutBufferSize) {
+    
     int firstElement;
     firstElement = static_cast<int>(pMap[0]);
     
@@ -127,6 +150,7 @@ int FindPath(const int nStartX, const int nStartY,
     Node n1(0,0);
     Node n2(1,0);
     bool nodeEquality = n1.isEqual(n2);
+    
     cout << nodeEquality << endl;
     cout << "Done testing equals..." << endl;
     
@@ -142,7 +166,9 @@ int FindPath(const int nStartX, const int nStartY,
     Node startNode(nStartX, nStartY);
     set<Node> closedSet;
     
+    cout << "-------------------------------" << endl;
     cout << "Testing priority queue" << endl;
+    
     priority_queue<int> queue;
     
     for (int number : {1,8,5,6,3,4,0,9,7,2}) {
@@ -150,7 +176,6 @@ int FindPath(const int nStartX, const int nStartY,
     }
     
     printPriorityQueue(queue);
-    
     priority_queue<int, vector<int>, greater<int>> secondQueue;
     
     for (int number : {1,8,5,6,3,4,0,9,7,2}) {
@@ -169,43 +194,115 @@ int FindPath(const int nStartX, const int nStartY,
     nodeQueue.push(secondNode);
     nodeQueue.push(thirdNode);
     auto topNode = nodeQueue.top();
+    
+    cout << "nodequeue size " << nodeQueue.size() << endl;
     cout << "Top node fscore: " << topNode.fScore << endl;
+    
+    Node nodeNotInQueue(12,12);
+    
+    cout << "n1 in queue: " << queueContains(nodeQueue, firstNode) << endl;
+    cout << "should not be in queue: " << queueContains(nodeQueue, nodeNotInQueue) << endl;
+    cout << "I started populating a test node map." << endl;
+    
+    Node fourthNode(1,4);
+    map<Node, Node> nodeMap;
+    pair<Node, Node> firstPair(firstNode, secondNode);
+    pair<Node, Node> secondPair(thirdNode, fourthNode);
+    pair<Node, Node> thirdPair(firstNode, thirdNode);
+    nodeMap.insert(firstPair);
+    nodeMap.insert(secondPair);
+    nodeMap.insert(thirdPair);
+    
+    cout << "I finished populating the node map." << endl;
+    cout << "Counting a node in map: " << nodeMap.count(fourthNode) << endl;
+    cout << "Alright, count seems to work as a keyset contains in a map..." << endl;
     cout << "Done testing priority queue..." << endl;
     
+    vector<Node> nodeVector;
+    nodeVector.push_back(firstNode);
+    nodeVector.push_back(secondNode);
+    
+    cout << "I should test element contains in a node set." << endl;
+    set<Node> nodeSet;
+    nodeSet.insert(firstNode);
+    nodeSet.insert(secondNode);
+    cout <<  "The first and the second node are now both in the set, but not the third and the fourth." << endl;
+    cout << "Count first node: " << nodeSet.count(firstNode) << endl;
+    cout << "Count second node: " << nodeSet.count(secondNode) << endl;
+    cout << "Count third node: " << nodeSet.count(thirdNode) << endl;
+    cout << "Count fourth node: " << nodeSet.count(fourthNode) << endl;
+    cout << "The method obviously works?" << endl;
+    set<Node>::iterator it;
+    it = nodeSet.find(firstNode);
+    bool nodeExistsInSet = it != nodeSet.end();
+    cout << "Find on first node in set: " << nodeExistsInSet << endl;
+    it = nodeSet.find(fourthNode);
+    nodeExistsInSet = it != nodeSet.end();
+    cout << "Find on fourth node in set: " << nodeExistsInSet << endl;
+    Node identicalToFirstNode(0,1);
+    it = nodeSet.find(identicalToFirstNode);
+    nodeExistsInSet = it != nodeSet.end();
+    cout << "Find on identical node in set: " << nodeExistsInSet << endl;
+    Node fifthNode(1337,12);
+    nodeSet.insert(fifthNode);
+    
+    cout << "I'm starting to test my own contains method now." << endl;
+    
+    cout << setContainsNode(nodeSet, firstNode) << endl;
+    cout << setContainsNode(nodeSet, secondNode) << endl;
+    cout << setContainsNode(nodeSet, thirdNode) << endl;
+    cout << setContainsNode(nodeSet, fourthNode) << endl;
+    cout << setContainsNode(nodeSet, fifthNode) << endl;
+    cout << setContainsNode(nodeSet, identicalToFirstNode) << endl;
+    
+    cout << "It works as intended." << endl;
+    
+    cout << "-------------------------------" << endl;
     
     priority_queue<Node> openSet;
-
     openSet.push(startNode);
     map<Node, Node> cameFrom;
     startNode.gScore = 0;
     Node goalNode(nTargetX, nTargetY);
     startNode.fScore = startNode.heuristicDistanceFunction(goalNode);
     
-    
     while (!openSet.empty()) {
-        auto currentNode = openSet.top();
+        Node currentNode = openSet.top();
         if (currentNode.isEqual(goalNode)) {
-            vector<Node> totalPath = reconstructPath(cameFrom, currentNode);
-            return sizeof(totalPath);
+            //vector<Node> totalPath = reconstructPath(cameFrom, currentNode);
+            //return static_cast<int>(totalPath.size());
+            return 1;
         }
         openSet.pop();
         closedSet.insert(currentNode);
+        cout << "I inserted " << currentNode.xPosition << " " << currentNode.yPosition <<  " in the closed set" << endl;
         vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth);
         
-        for (auto neighbor : currentNeighbors) {
-            if (closedSet.count(neighbor)) {
+        for (Node neighbor : currentNeighbors) {
+            cout << "current node: " << currentNode.xPosition << " " << currentNode.yPosition << " neighbor " << neighbor.xPosition << " " << neighbor.yPosition << endl;
+            if (setContainsNode(closedSet, neighbor)) {
+                cout << "I decided that neighbor " << neighbor.xPosition << " " << neighbor.yPosition << " was in the closed set and continued looping." << endl;
+                cout << "closed set contained neighbor" << endl;
                 continue;
             }
             int tentativeGScore = currentNode.gScore + 1; // dist between?
             if (!queueContains(openSet, neighbor)) {
                 openSet.push(neighbor);
+                cout << "I pushed a node to the open set." << endl;
             } else if (tentativeGScore >= neighbor.gScore) {
+                cout << "I decided to continue." << endl;
                 continue;
             }
             cameFrom.insert(pair<Node, Node>(neighbor, currentNode));
             neighbor.gScore = tentativeGScore;
             neighbor.fScore = neighbor.gScore + neighbor.heuristicDistanceFunction(goalNode);
         }
+        cout << "-----------START NEIGHBOR LOOP--------------------" << endl;
+        cout << "number of neighbors " << currentNeighbors.size() << endl;
+        cout << "open set size " << openSet.size() << endl;
+        cout << "closed set size " << closedSet.size() << endl;
+        cout << "came from size " << cameFrom.size() << endl;
+        cout << "-----------END NEIGHBOR LOOP--------------------" << endl;
     }
     
     return -1;
