@@ -28,6 +28,16 @@ struct Node {
     Node(int xCoordinate, int yCoordinate) {
         this -> xPosition = xCoordinate;
         this -> yPosition = yCoordinate;
+        this -> fScore = 0;
+        this -> gScore = 0;
+    }
+    
+    void setFScore(int nFScore) {
+        this->fScore = nFScore;
+    }
+    
+    void setGScore(int nGScore) {
+        this->gScore = nGScore;
     }
     
     bool operator<(const Node& comparableNode) const {
@@ -54,6 +64,15 @@ struct Node {
             && this -> yPosition == anotherNode.yPosition
             && this -> fScore == anotherNode.fScore
             && this -> gScore == anotherNode.gScore) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    bool hasEqualCoordinates(const Node& anotherNode) {
+        if (this -> xPosition == anotherNode.xPosition
+            && this -> yPosition == anotherNode.yPosition) {
             return true;
         } else {
             return false;
@@ -129,7 +148,7 @@ vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
 
 bool setContainsNode(const set<Node>& nodeSet, const Node& nodeCandidate) {
     for (auto nodeElement : nodeSet) {
-        if (nodeElement.isEqual(nodeCandidate)) {
+        if (nodeElement.hasEqualCoordinates(nodeCandidate)) {
             return true;
         }
     }
@@ -260,6 +279,7 @@ int FindPath(const int nStartX, const int nStartY,
     cout << "-------------------------------" << endl;
     
     priority_queue<Node> openSet;
+    
     openSet.push(startNode);
     map<Node, Node> cameFrom;
     startNode.gScore = 0;
@@ -268,7 +288,7 @@ int FindPath(const int nStartX, const int nStartY,
     
     while (!openSet.empty()) {
         Node currentNode = openSet.top();
-        if (currentNode.isEqual(goalNode)) {
+        if (currentNode.hasEqualCoordinates(goalNode)) {
             //vector<Node> totalPath = reconstructPath(cameFrom, currentNode);
             //return static_cast<int>(totalPath.size());
             return 1;
@@ -278,7 +298,7 @@ int FindPath(const int nStartX, const int nStartY,
         cout << "I inserted " << currentNode.xPosition << " " << currentNode.yPosition <<  " in the closed set" << endl;
         vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth);
         
-        for (Node neighbor : currentNeighbors) {
+        for (Node& neighbor : currentNeighbors) {
             cout << "current node: " << currentNode.xPosition << " " << currentNode.yPosition << " neighbor " << neighbor.xPosition << " " << neighbor.yPosition << endl;
             if (setContainsNode(closedSet, neighbor)) {
                 cout << "I decided that neighbor " << neighbor.xPosition << " " << neighbor.yPosition << " was in the closed set and continued looping." << endl;
@@ -286,16 +306,27 @@ int FindPath(const int nStartX, const int nStartY,
                 continue;
             }
             int tentativeGScore = currentNode.gScore + 1; // dist between?
+            bool shouldPushToOpenSet = false;
             if (!queueContains(openSet, neighbor)) {
-                openSet.push(neighbor);
+                shouldPushToOpenSet = true;
+                //openSet.push(neighbor);
                 cout << "I pushed a node to the open set." << endl;
             } else if (tentativeGScore >= neighbor.gScore) {
                 cout << "I decided to continue." << endl;
                 continue;
             }
+            
             cameFrom.insert(pair<Node, Node>(neighbor, currentNode));
             neighbor.gScore = tentativeGScore;
             neighbor.fScore = neighbor.gScore + neighbor.heuristicDistanceFunction(goalNode);
+            
+            if (shouldPushToOpenSet) {
+                openSet.push(neighbor);
+            }
+            
+            cout << "lol" << endl;
+                
+            
         }
         cout << "-----------START NEIGHBOR LOOP--------------------" << endl;
         cout << "number of neighbors " << currentNeighbors.size() << endl;
