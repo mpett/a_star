@@ -118,10 +118,10 @@ vector<Node> reconstructPath(const map<Node, Node>& cameFrom, Node currentNodeCo
 }
 
 vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
-                          const unordered_map<int,Node>& inputMap, int width) {
+                          const unordered_map<int,Node>& inputMap, int width, int bufferSize) {
     vector<Node> neighbors;
     
-    int mapSize = sizeof(pMap);
+    int mapSize = bufferSize;
     bool isNextToLeftWall = currentNode.xPosition == 0;
     bool isNextToRightWall = currentNode.xPosition == width - 1;
     int currentNodeIndex = currentNode.xPosition + currentNode.yPosition * width;
@@ -296,9 +296,9 @@ int FindPath(const int nStartX, const int nStartY,
         openSet.pop();
         closedSet.insert(currentNode);
         cout << "I inserted " << currentNode.xPosition << " " << currentNode.yPosition <<  " in the closed set" << endl;
-        vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth);
+        vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
         
-        for (Node& neighbor : currentNeighbors) {
+        for (Node neighbor : currentNeighbors) {
             cout << "current node: " << currentNode.xPosition << " " << currentNode.yPosition << " neighbor " << neighbor.xPosition << " " << neighbor.yPosition << endl;
             if (setContainsNode(closedSet, neighbor)) {
                 cout << "I decided that neighbor " << neighbor.xPosition << " " << neighbor.yPosition << " was in the closed set and continued looping." << endl;
