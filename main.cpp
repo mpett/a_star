@@ -316,9 +316,11 @@ int FindPath(const int nStartX, const int nStartY,
                 continue;
             }
             
-            cameFrom.insert(pair<Node, Node>(neighbor, currentNode));
             neighbor.gScore = tentativeGScore;
             neighbor.fScore = neighbor.gScore + neighbor.heuristicDistanceFunction(goalNode);
+            pair<Node, Node> lol(Node(neighbor.xPosition, neighbor.yPosition), Node(currentNode.xPosition, currentNode.yPosition));
+            cameFrom.insert(lol);
+            cout << "I should have inserted a new pair into cameFrom." << endl;
             
             if (shouldPushToOpenSet) {
                 openSet.push(neighbor);
