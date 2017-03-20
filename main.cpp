@@ -11,11 +11,13 @@
 #include <sstream>
 #include <stdlib.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <functional>
 #include <queue>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 using namespace std;
 
@@ -146,9 +148,17 @@ vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
     return neighbors;
 }
 
+bool vectorContainsNode(const vector<Node>& nodeVector, const Node& nodeCandidate) {
+    if (find(nodeVector.begin(), nodeVector.end(), nodeCandidate) != nodeVector.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool setContainsNode(const set<Node>& nodeSet, const Node& nodeCandidate) {
     for (auto nodeElement : nodeSet) {
-        if (nodeElement.hasEqualCoordinates(nodeCandidate)) {
+        if (nodeElement.isEqual(nodeCandidate)) {
             return true;
         }
     }
@@ -183,7 +193,8 @@ int FindPath(const int nStartX, const int nStartY,
     }
     
     Node startNode(nStartX, nStartY);
-    set<Node> closedSet;
+    vector<Node> closedVector;
+    vector<Node> lol;
     
     cout << "-------------------------------" << endl;
     cout << "Testing priority queue" << endl;
@@ -280,11 +291,12 @@ int FindPath(const int nStartX, const int nStartY,
     
     priority_queue<Node> openSet;
     
-    openSet.push(startNode);
+    
     map<Node, Node> cameFrom;
     startNode.gScore = 0;
     Node goalNode(nTargetX, nTargetY);
     startNode.fScore = startNode.heuristicDistanceFunction(goalNode);
+    openSet.push(startNode);
     
     while (!openSet.empty()) {
         Node currentNode = openSet.top();
@@ -294,15 +306,15 @@ int FindPath(const int nStartX, const int nStartY,
             return 1;
         }
         openSet.pop();
-        closedSet.insert(currentNode);
+        closedVector.push_back(currentNode);
+        
         cout << "I inserted " << currentNode.xPosition << " " << currentNode.yPosition <<  " in the closed set" << endl;
         vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
         
         for (Node neighbor : currentNeighbors) {
             cout << "current node: " << currentNode.xPosition << " " << currentNode.yPosition << " neighbor " << neighbor.xPosition << " " << neighbor.yPosition << endl;
-            if (setContainsNode(closedSet, neighbor)) {
+            if (vectorContainsNode(closedVector, neighbor)) {
                 cout << "I decided that neighbor " << neighbor.xPosition << " " << neighbor.yPosition << " was in the closed set and continued looping." << endl;
-                cout << "closed set contained neighbor" << endl;
                 continue;
             }
             int tentativeGScore = currentNode.gScore + 1; // dist between?
@@ -333,7 +345,7 @@ int FindPath(const int nStartX, const int nStartY,
         cout << "-----------START NEIGHBOR LOOP--------------------" << endl;
         cout << "number of neighbors " << currentNeighbors.size() << endl;
         cout << "open set size " << openSet.size() << endl;
-        cout << "closed set size " << closedSet.size() << endl;
+        cout << "closed set size " << closedVector.size() << endl;
         cout << "came from size " << cameFrom.size() << endl;
         cout << "-----------END NEIGHBOR LOOP--------------------" << endl;
     }
