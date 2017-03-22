@@ -48,9 +48,7 @@ struct Node {
     
     bool operator==(const Node& anotherNode) const {
         if (this -> xPosition == anotherNode.xPosition
-            && this -> yPosition == anotherNode.yPosition
-            && this -> fScore == anotherNode.fScore
-            && this -> gScore == anotherNode.gScore) {
+            && this -> yPosition == anotherNode.yPosition) {
             return true;
         } else {
             return false;
@@ -108,13 +106,16 @@ bool queueContains(priority_queue<Node> nodeQueue, const Node& possibleNode) {
     return false;
 }
 
-vector<Node> reconstructPath(const map<Node, Node>& cameFrom, Node currentNodeCopy) {
-    vector<Node> totalPath;
-    Node & currentNode = currentNodeCopy;
-    totalPath.push_back(currentNode);
-    while (cameFrom.count(currentNode)) {
-        currentNode = cameFrom.at(currentNode);
-        totalPath.push_back(currentNode);
+vector<int> reconstructPath(unordered_map<int, int>& cameFrom, int goalNodeIndex, int startNodeIndex) {
+    vector<int> totalPath;
+    int nodeIndex = goalNodeIndex;
+    totalPath.push_back(goalNodeIndex);
+    while (true) {
+        nodeIndex = cameFrom[nodeIndex];
+        totalPath.push_back(nodeIndex);
+        if (nodeIndex == startNodeIndex) {
+            return totalPath;
+        }
     }
     return totalPath;
 }
@@ -290,9 +291,7 @@ int FindPath(const int nStartX, const int nStartY,
     cout << "-------------------------------" << endl;
     
     priority_queue<Node> openSet;
-    
-    
-    map<Node, Node> cameFrom;
+    unordered_map<int, int> cameFrom;
     startNode.gScore = 0;
     Node goalNode(nTargetX, nTargetY);
     startNode.fScore = startNode.heuristicDistanceFunction(goalNode);
@@ -301,7 +300,9 @@ int FindPath(const int nStartX, const int nStartY,
     while (!openSet.empty()) {
         Node currentNode = openSet.top();
         if (currentNode.hasEqualCoordinates(goalNode)) {
-            //vector<Node> totalPath = reconstructPath(cameFrom, currentNode);
+            int currentNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
+            int startNodeIndex = nStartY * nMapWidth + nStartX;
+            vector<int> totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             //return static_cast<int>(totalPath.size());
             return 1;
         }
@@ -311,7 +312,7 @@ int FindPath(const int nStartX, const int nStartY,
         cout << "I inserted " << currentNode.xPosition << " " << currentNode.yPosition <<  " in the closed set" << endl;
         vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
         
-        for (Node neighbor : currentNeighbors) {
+        for (Node& neighbor : currentNeighbors) {
             cout << "current node: " << currentNode.xPosition << " " << currentNode.yPosition << " neighbor " << neighbor.xPosition << " " << neighbor.yPosition << endl;
             if (vectorContainsNode(closedVector, neighbor)) {
                 cout << "I decided that neighbor " << neighbor.xPosition << " " << neighbor.yPosition << " was in the closed set and continued looping." << endl;
@@ -330,8 +331,11 @@ int FindPath(const int nStartX, const int nStartY,
             
             neighbor.gScore = tentativeGScore;
             neighbor.fScore = neighbor.gScore + neighbor.heuristicDistanceFunction(goalNode);
-            pair<Node, Node> lol(Node(neighbor.xPosition, neighbor.yPosition), Node(currentNode.xPosition, currentNode.yPosition));
-            cameFrom.insert(lol);
+            int keyNodeIndex = neighbor.yPosition * nMapWidth + neighbor.xPosition;
+            int valueNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
+            cameFrom[keyNodeIndex] = valueNodeIndex;
+            
+            
             cout << "I should have inserted a new pair into cameFrom." << endl;
             
             if (shouldPushToOpenSet) {
@@ -356,7 +360,7 @@ int FindPath(const int nStartX, const int nStartY,
 int main(int argc, const char * argv[]) {
     unsigned char pMap[] = {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1};
     int pOutBuffer[12];
-    int result = FindPath(0, 0, 1, 2, pMap, 4, 3, pOutBuffer, 12);
+    int result = FindPath(0, 0, 2, 2, pMap, 4, 3, pOutBuffer, 12);
     cout << "result: " << result << endl;
     return 0;
 }
