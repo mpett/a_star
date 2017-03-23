@@ -79,6 +79,37 @@ struct Node {
     }
 };
 
+template <typename T>
+bool vectorContains(const vector<T>& inputVector, const T& candidateElement) {
+    if (find(inputVector.begin(), inputVector.end(), candidateElement) != inputVector.end()) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[], int width, int height) {
+    for (int yPosition = height - 1; yPosition >= 0; yPosition--) {
+        for (int xPosition = 0; xPosition < width; xPosition++) {
+            int currentIndex = yPosition * width + xPosition;
+            
+            if (vectorContains(totalPath, currentIndex)) {
+                cout << " x ";
+                continue;
+            }
+            
+            bool nodeIsPassable = (int) pMap[currentIndex];
+            
+            if (nodeIsPassable) {
+                cout << " - ";
+            } else {
+                cout << " # ";
+            }
+        }
+        cout << endl << endl;
+    }
+}
+
 bool queueContains(priority_queue<Node> nodeQueue, const Node& possibleNode) {
     while (!nodeQueue.empty()) {
         auto topNode = nodeQueue.top();
@@ -128,20 +159,14 @@ vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
     return neighbors;
 }
 
-bool vectorContainsNode(const vector<Node>& nodeVector, const Node& nodeCandidate) {
-    if (find(nodeVector.begin(), nodeVector.end(), nodeCandidate) != nodeVector.end()) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
              int* pOutBuffer, const int nOutBufferSize) {
     
     unordered_map<int, Node> inputMap;
+    
+    
     
     for (int yCoordinate = 0; yCoordinate < nMapHeight; yCoordinate++) {
         for (int xCoordinate = 0; xCoordinate < nMapWidth; xCoordinate++) {
@@ -170,15 +195,17 @@ int FindPath(const int nStartX, const int nStartY,
             int currentNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
             int startNodeIndex = nStartY * nMapWidth + nStartX;
             vector<int> totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
+            outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             return static_cast<int>(totalPath.size());
         }
         
         openSet.pop();
         closedVector.push_back(currentNode);
-        vector<Node> currentNeighbors = getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
+        vector<Node> currentNeighbors =
+            getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
         
         for (auto& neighbor : currentNeighbors) {
-            if (vectorContainsNode(closedVector, neighbor))
+            if (vectorContains(closedVector, neighbor))
                 continue;
             
             int tentativeGScore = currentNode.gScore + 1; // dist between?
@@ -204,7 +231,14 @@ int FindPath(const int nStartX, const int nStartY,
 }
 
 int main(int argc, const char * argv[]) {
-    unsigned char pMap[] = {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1};
-    int pOutBuffer[12];
-    return FindPath(0, 0, 2, 2, pMap, 4, 3, pOutBuffer, 12);
+    unsigned char pMap[] = {1, 1, 1, 1, 1, 0, 1, 1,
+        0, 1, 0, 0, 0, 0, 1, 1,
+        0, 1, 1, 0, 0, 1, 1, 1,
+        0, 1, 0, 0, 0, 1, 0, 0,
+        0, 1, 1, 0, 1, 1, 1, 1,
+        0, 1, 0, 0, 1, 1, 0, 1,
+        1, 1, 1, 0, 1, 0, 0, 1,
+        1, 1, 1, 1, 1, 1, 1, 1};
+    int pOutBuffer[64];
+    return FindPath(0, 0, 7, 0, pMap, 8, 8, pOutBuffer, 64);
 }
