@@ -47,11 +47,11 @@ struct Node {
         }
     }
     
-    int inputIndex(int width) {
+    int inputIndex(const int width) const {
         return yPosition * width + xPosition;
     }
     
-    bool isEqual(const Node & anotherNode) {
+    bool isEqual(const Node & anotherNode) const {
         if (this -> xPosition == anotherNode.xPosition
             && this -> yPosition == anotherNode.yPosition
             && this -> fScore == anotherNode.fScore
@@ -62,7 +62,7 @@ struct Node {
         }
     }
     
-    bool hasEqualCoordinates(const Node& anotherNode) {
+    bool hasEqualCoordinates(const Node& anotherNode) const {
         if (this -> xPosition == anotherNode.xPosition
             && this -> yPosition == anotherNode.yPosition) {
             return true;
@@ -71,7 +71,7 @@ struct Node {
         }
     }
     
-    int heuristicDistanceFunction(const Node& destinationNode) {
+    int heuristicDistanceFunction(const Node& destinationNode) const {
         int xDistance = destinationNode.xPosition - this -> xPosition;
         int yDistance = destinationNode.yPosition - this -> yPosition;
         int manhattanDistance = std::abs(xDistance) + std::abs(yDistance);
@@ -88,7 +88,7 @@ bool vectorContains(const vector<T>& inputVector, const T& candidateElement) {
     }
 }
 
-void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[], int width, int height) {
+void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[], const int width, const int height) {
     for (int yPosition = height - 1; yPosition >= 0; yPosition--) {
         for (int xPosition = 0; xPosition < width; xPosition++) {
             int currentIndex = yPosition * width + xPosition;
@@ -121,7 +121,7 @@ bool queueContains(priority_queue<Node> nodeQueue, const Node& possibleNode) {
     return false;
 }
 
-vector<int> reconstructPath(unordered_map<int, int>& cameFrom, int goalNodeIndex, int startNodeIndex) {
+vector<int> reconstructPath(unordered_map<int, int>& cameFrom, const int goalNodeIndex, const int startNodeIndex) {
     vector<int> totalPath;
     int nodeIndex = goalNodeIndex;
     totalPath.push_back(goalNodeIndex);
@@ -136,7 +136,7 @@ vector<int> reconstructPath(unordered_map<int, int>& cameFrom, int goalNodeIndex
 }
 
 vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
-                          const unordered_map<int,Node>& inputMap, int width, int bufferSize) {
+                          const unordered_map<int,Node>& inputMap, const int width, const int bufferSize) {
     vector<Node> neighbors;
     int mapSize = bufferSize;
     bool isNextToLeftWall = currentNode.xPosition == 0;
@@ -166,8 +166,6 @@ int FindPath(const int nStartX, const int nStartY,
     
     unordered_map<int, Node> inputMap;
     
-    
-    
     for (int yCoordinate = 0; yCoordinate < nMapHeight; yCoordinate++) {
         for (int xCoordinate = 0; xCoordinate < nMapWidth; xCoordinate++) {
             Node nodeToBeInserted(xCoordinate, yCoordinate);
@@ -189,19 +187,19 @@ int FindPath(const int nStartX, const int nStartY,
     openSet.push(startNode);
     
     while (!openSet.empty()) {
-        Node currentNode = openSet.top();
+        auto currentNode = openSet.top();
         
         if (currentNode.hasEqualCoordinates(goalNode)) {
             int currentNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
             int startNodeIndex = nStartY * nMapWidth + nStartX;
-            vector<int> totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
+            auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             return static_cast<int>(totalPath.size());
         }
         
         openSet.pop();
         closedVector.push_back(currentNode);
-        vector<Node> currentNeighbors =
+        auto currentNeighbors =
             getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
         
         for (auto& neighbor : currentNeighbors) {
