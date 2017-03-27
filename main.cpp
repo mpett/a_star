@@ -88,7 +88,8 @@ bool vectorContains(const vector<T>& inputVector, const T& candidateElement) {
     }
 }
 
-void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[], const int width, const int height) {
+void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[],
+                      const int width, const int height) {
     for (int yPosition = height - 1; yPosition >= 0; yPosition--) {
         for (int xPosition = 0; xPosition < width; xPosition++) {
             int currentIndex = yPosition * width + xPosition;
@@ -121,7 +122,8 @@ bool queueContains(priority_queue<Node> nodeQueue, const Node& possibleNode) {
     return false;
 }
 
-vector<int> reconstructPath(unordered_map<int, int>& cameFrom, const int goalNodeIndex, const int startNodeIndex) {
+vector<int> reconstructPath(unordered_map<int, int>& cameFrom,
+                            const int goalNodeIndex, const int startNodeIndex) {
     vector<int> totalPath;
     int nodeIndex = goalNodeIndex;
     totalPath.push_back(goalNodeIndex);
@@ -136,7 +138,8 @@ vector<int> reconstructPath(unordered_map<int, int>& cameFrom, const int goalNod
 }
 
 vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
-                          const unordered_map<int,Node>& inputMap, const int width, const int bufferSize) {
+                          const unordered_map<int,Node>& inputMap,
+                          const int width, const int bufferSize) {
     vector<Node> neighbors;
     int mapSize = bufferSize;
     bool isNextToLeftWall = currentNode.xPosition == 0;
@@ -229,14 +232,14 @@ int FindPath(const int nStartX, const int nStartY,
 }
 
 int main(int argc, const char * argv[]) {
-    unsigned char pMap[] = {1, 1, 1, 1, 1, 0, 1, 1,
+    unsigned char pMap[] = {1, 1, 0, 1, 1, 1, 1, 1,
         0, 1, 0, 0, 0, 0, 1, 1,
         0, 1, 1, 0, 0, 1, 1, 1,
         0, 1, 0, 0, 0, 1, 0, 0,
-        0, 1, 1, 0, 1, 1, 1, 1,
+        0, 1, 1, 1, 1, 1, 1, 1,
         0, 1, 0, 0, 1, 1, 0, 1,
         1, 1, 1, 0, 1, 0, 0, 1,
         1, 1, 1, 1, 1, 1, 1, 1};
     int pOutBuffer[64];
-    return FindPath(0, 0, 7, 0, pMap, 8, 8, pOutBuffer, 64);
+    return FindPath(0, 0, 3, 0, pMap, 8, 8, pOutBuffer, 64);
 }
