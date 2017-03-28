@@ -197,6 +197,13 @@ int FindPath(const int nStartX, const int nStartY,
             int startNodeIndex = nStartY * nMapWidth + nStartX;
             auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
+            // Should be some sort of mutex lock here.
+            int maxIndex = (int) totalPath.size() > nOutBufferSize ? nOutBufferSize : (int) totalPath.size();
+            for (int index = 0; index < maxIndex; index++) {
+                int pathElement = totalPath[index];
+                pOutBuffer[index] = pathElement;
+            }
+            // Should be unlocked here.
             return static_cast<int>(totalPath.size());
         }
         
@@ -241,5 +248,7 @@ int main(int argc, const char * argv[]) {
         1, 1, 1, 0, 1, 0, 0, 1,
         1, 1, 1, 1, 1, 1, 1, 1};
     int pOutBuffer[64];
-    return FindPath(0, 0, 3, 0, pMap, 8, 8, pOutBuffer, 64);
+    int lol =  FindPath(0, 0, 3, 0, pMap, 8, 8, pOutBuffer, 64);
+    cout << "lol" << endl;
+    return lol;
 }
