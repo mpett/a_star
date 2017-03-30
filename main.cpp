@@ -18,6 +18,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <mutex>
 
 using namespace std;
 
@@ -197,8 +198,10 @@ int FindPath(const int nStartX, const int nStartY,
             int startNodeIndex = nStartY * nMapWidth + nStartX;
             auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
-            // Should be some sort of mutex lock here.
-            int pathSize = totalPath.size();
+            int pathSize = (int) totalPath.size();
+            
+            mutex mtx;
+            mtx.lock();
             for (int index = 0; index < nOutBufferSize; index++) {
                 int pathElement = totalPath[index];
                 if (index >= pathSize) {
@@ -207,7 +210,8 @@ int FindPath(const int nStartX, const int nStartY,
                     pOutBuffer[index] = pathElement;
                 }
             }
-            // Should be unlocked here.
+            mtx.unlock();
+            
             return static_cast<int>(totalPath.size());
         }
         
@@ -252,7 +256,5 @@ int main(int argc, const char * argv[]) {
         1, 1, 1, 0, 1, 0, 0, 1,
         1, 1, 1, 1, 1, 1, 1, 1};
     int pOutBuffer[64];
-    int lol =  FindPath(0, 0, 3, 0, pMap, 8, 8, pOutBuffer, 64);
-    cout << "lol" << endl;
-    return lol;
+    return FindPath(0, 0, 3, 0, pMap, 8, 8, pOutBuffer, 64);
 }
