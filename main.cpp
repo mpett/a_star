@@ -11,8 +11,6 @@
 #include <sstream>
 #include <stdlib.h>
 #include <unordered_map>
-#include <unordered_set>
-#include <set>
 #include <functional>
 #include <queue>
 #include <vector>
@@ -94,14 +92,11 @@ void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[],
     for (int yPosition = height - 1; yPosition >= 0; yPosition--) {
         for (int xPosition = 0; xPosition < width; xPosition++) {
             int currentIndex = yPosition * width + xPosition;
-            
             if (vectorContains(totalPath, currentIndex)) {
                 cout << " x ";
                 continue;
             }
-            
             bool nodeIsPassable = (int) pMap[currentIndex];
-            
             if (nodeIsPassable) {
                 cout << " - ";
             } else {
@@ -146,7 +141,6 @@ vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
     bool isNextToLeftWall = currentNode.xPosition == 0;
     bool isNextToRightWall = currentNode.xPosition == width - 1;
     int currentNodeIndex = currentNode.xPosition + currentNode.yPosition * width;
-    
     if ((currentNodeIndex + 1) >= 0 && (currentNodeIndex + 1) < mapSize
         && !isNextToRightWall && static_cast<int>(pMap[currentNodeIndex + 1] != 0))
         neighbors.push_back(inputMap.at(currentNodeIndex + 1));
@@ -167,7 +161,6 @@ int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
              int* pOutBuffer, const int nOutBufferSize) {
-    
     unordered_map<int, Node> inputMap;
     
     for (int yCoordinate = 0; yCoordinate < nMapHeight; yCoordinate++) {
@@ -181,25 +174,20 @@ int FindPath(const int nStartX, const int nStartY,
     vector<Node> closedVector;
     priority_queue<Node> openSet;
     unordered_map<int, int> cameFrom;
-    
     Node startNode(nStartX, nStartY);
     startNode.gScore = 0;
-    
     Node goalNode(nTargetX, nTargetY);
     startNode.fScore = startNode.heuristicDistanceFunction(goalNode);
-    
     openSet.push(startNode);
     
     while (!openSet.empty()) {
         auto currentNode = openSet.top();
-        
         if (currentNode.hasEqualCoordinates(goalNode)) {
             int currentNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
             int startNodeIndex = nStartY * nMapWidth + nStartX;
             auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             int pathSize = (int) totalPath.size();
-            
             mutex mtx;
             mtx.lock();
             for (int index = 0; index < nOutBufferSize; index++) {
@@ -211,7 +199,6 @@ int FindPath(const int nStartX, const int nStartY,
                 }
             }
             mtx.unlock();
-            
             return static_cast<int>(totalPath.size());
         }
         
@@ -223,21 +210,17 @@ int FindPath(const int nStartX, const int nStartY,
         for (auto& neighbor : currentNeighbors) {
             if (vectorContains(closedVector, neighbor))
                 continue;
-            
             int tentativeGScore = currentNode.gScore + 1; // dist between?
             bool shouldPushToOpenSet = false;
-            
             if (!queueContains(openSet, neighbor))
                 shouldPushToOpenSet = true;
             else if (tentativeGScore >= neighbor.gScore)
                 continue;
-            
             neighbor.gScore = tentativeGScore;
             neighbor.fScore = neighbor.gScore + neighbor.heuristicDistanceFunction(goalNode);
             int keyNodeIndex = neighbor.yPosition * nMapWidth + neighbor.xPosition;
             int valueNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
             cameFrom[keyNodeIndex] = valueNodeIndex;
-            
             if (shouldPushToOpenSet)
                 openSet.push(neighbor);
         }
