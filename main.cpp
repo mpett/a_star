@@ -7,18 +7,8 @@
 //
 
 #include <iostream>
-#include <cmath>
-#include <sstream>
-#include <stdlib.h>
 #include <unordered_map>
-#include <functional>
 #include <queue>
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <mutex>
-
-using namespace std;
 
 struct Node {
     int xPosition;
@@ -26,7 +16,7 @@ struct Node {
     int fScore;
     int gScore;
     
-    Node(int xCoordinate, int yCoordinate) {
+    Node(const int xCoordinate, const int yCoordinate) {
         this -> xPosition = xCoordinate;
         this -> yPosition = yCoordinate;
         this -> fScore = 0;
@@ -79,7 +69,7 @@ struct Node {
 };
 
 template <typename T>
-bool vectorContains(const vector<T>& inputVector, const T& candidateElement) {
+bool vectorContains(const std::vector<T>& inputVector, const T& candidateElement) {
     if (find(inputVector.begin(), inputVector.end(), candidateElement) != inputVector.end()) {
         return true;
     } else {
@@ -87,27 +77,27 @@ bool vectorContains(const vector<T>& inputVector, const T& candidateElement) {
     }
 }
 
-void outputMapAndPath(const vector<int>& totalPath, const unsigned char pMap[],
+void outputMapAndPath(const std::vector<int>& totalPath, const unsigned char pMap[],
                       const int width, const int height) {
     for (int yPosition = height - 1; yPosition >= 0; yPosition--) {
         for (int xPosition = 0; xPosition < width; xPosition++) {
             int currentIndex = yPosition * width + xPosition;
             if (vectorContains(totalPath, currentIndex)) {
-                cout << " x ";
+                std::cout << " x ";
                 continue;
             }
             bool nodeIsPassable = (int) pMap[currentIndex];
             if (nodeIsPassable) {
-                cout << " - ";
+                std::cout << " - ";
             } else {
-                cout << " # ";
+                std::cout << " # ";
             }
         }
-        cout << endl << endl;
+        std::cout << std::endl << std::endl;
     }
 }
 
-bool queueContains(priority_queue<Node> nodeQueue, const Node& possibleNode) {
+bool queueContains(std::priority_queue<Node> nodeQueue, const Node& possibleNode) {
     while (!nodeQueue.empty()) {
         auto topNode = nodeQueue.top();
         if (topNode.isEqual(possibleNode)) {
@@ -118,9 +108,9 @@ bool queueContains(priority_queue<Node> nodeQueue, const Node& possibleNode) {
     return false;
 }
 
-vector<int> reconstructPath(unordered_map<int, int>& cameFrom,
+std::vector<int> reconstructPath(std::unordered_map<int, int>& cameFrom,
                             const int goalNodeIndex, const int startNodeIndex) {
-    vector<int> totalPath;
+    std::vector<int> totalPath;
     int nodeIndex = goalNodeIndex;
     totalPath.push_back(goalNodeIndex);
     while (true) {
@@ -133,10 +123,10 @@ vector<int> reconstructPath(unordered_map<int, int>& cameFrom,
     return totalPath;
 }
 
-vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
-                          const unordered_map<int,Node>& inputMap,
+std::vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
+                               const std::unordered_map<int,Node>& inputMap,
                           const int width, const int bufferSize) {
-    vector<Node> neighbors;
+    std::vector<Node> neighbors;
     int mapSize = bufferSize;
     bool isNextToLeftWall = currentNode.xPosition == 0;
     bool isNextToRightWall = currentNode.xPosition == width - 1;
@@ -161,19 +151,19 @@ int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
              int* pOutBuffer, const int nOutBufferSize) {
-    unordered_map<int, Node> inputMap;
+    std::unordered_map<int, Node> inputMap;
     
     for (int yCoordinate = 0; yCoordinate < nMapHeight; yCoordinate++) {
         for (int xCoordinate = 0; xCoordinate < nMapWidth; xCoordinate++) {
             Node nodeToBeInserted(xCoordinate, yCoordinate);
             int inputKey = yCoordinate * nMapWidth + xCoordinate;
-            inputMap.insert(pair<int, Node>(inputKey, nodeToBeInserted));
+            inputMap.insert(std::pair<int, Node>(inputKey, nodeToBeInserted));
         }
     }
     
-    vector<Node> closedVector;
-    priority_queue<Node> openSet;
-    unordered_map<int, int> cameFrom;
+    std::vector<Node> closedVector;
+    std::priority_queue<Node> openSet;
+    std::unordered_map<int, int> cameFrom;
     Node startNode(nStartX, nStartY);
     startNode.gScore = 0;
     Node goalNode(nTargetX, nTargetY);
@@ -188,7 +178,7 @@ int FindPath(const int nStartX, const int nStartY,
             auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             int pathSize = (int) totalPath.size();
-            mutex mtx;
+            std::mutex mtx;
             mtx.lock();
             for (int index = 0; index < nOutBufferSize; index++) {
                 int pathElement = totalPath[index];
