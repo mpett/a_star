@@ -115,10 +115,10 @@ std::vector<int> reconstructPath(std::unordered_map<int, int>& cameFrom,
     totalPath.push_back(goalNodeIndex);
     while (true) {
         nodeIndex = cameFrom[nodeIndex];
-        totalPath.push_back(nodeIndex);
         if (nodeIndex == startNodeIndex) {
             return totalPath;
         }
+        totalPath.push_back(nodeIndex);
     }
     return totalPath;
 }
@@ -183,7 +183,7 @@ int FindPath(const int nStartX, const int nStartY,
             for (int index = 0; index < nOutBufferSize; index++) {
                 int pathElement = totalPath[index];
                 if (index >= pathSize) {
-                    pOutBuffer[index] = 0;
+                    pOutBuffer[index] = -1;
                 } else {
                     pOutBuffer[index] = pathElement;
                 }
@@ -220,14 +220,9 @@ int FindPath(const int nStartX, const int nStartY,
 }
 
 int main(int argc, const char * argv[]) {
-    unsigned char pMap[] = {1, 1, 0, 1, 1, 1, 1, 1,
-        0, 1, 0, 0, 0, 0, 1, 1,
-        0, 1, 1, 0, 0, 1, 1, 1,
-        0, 1, 0, 0, 0, 1, 0, 0,
-        0, 1, 1, 1, 1, 1, 1, 1,
-        0, 1, 0, 0, 1, 1, 0, 1,
-        1, 1, 1, 0, 1, 0, 0, 1,
-        1, 1, 1, 1, 1, 1, 1, 1};
-    int pOutBuffer[64];
-    return FindPath(0, 0, 3, 0, pMap, 8, 8, pOutBuffer, 64);
+    unsigned char pMap[] = {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1};
+    int pOutBuffer[12];
+    int result = FindPath(0, 0, 1, 2, pMap, 4, 3, pOutBuffer, 12);
+    std::cout << "lol" << std::endl;
+    return result;
 }
