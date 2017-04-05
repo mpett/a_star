@@ -109,7 +109,7 @@ bool queueContains(std::priority_queue<Node> nodeQueue, const Node& possibleNode
 }
 
 std::vector<int> reconstructPath(std::unordered_map<int, int>& cameFrom,
-                            const int goalNodeIndex, const int startNodeIndex) {
+                                 const int goalNodeIndex, const int startNodeIndex) {
     std::vector<int> totalPath;
     int nodeIndex = goalNodeIndex;
     totalPath.push_back(goalNodeIndex);
@@ -125,7 +125,7 @@ std::vector<int> reconstructPath(std::unordered_map<int, int>& cameFrom,
 
 std::vector<Node> getNeighbors(const Node& currentNode, const unsigned char * pMap,
                                const std::unordered_map<int,Node>& inputMap,
-                          const int width, const int bufferSize) {
+                               const int width, const int bufferSize) {
     std::vector<Node> neighbors;
     int mapSize = bufferSize;
     bool isNextToLeftWall = currentNode.xPosition == 0;
@@ -178,6 +178,7 @@ int FindPath(const int nStartX, const int nStartY,
             auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             int pathSize = (int) totalPath.size();
+            std::reverse(totalPath.begin(), totalPath.end());
             std::mutex mtx;
             mtx.lock();
             for (int index = 0; index < nOutBufferSize; index++) {
@@ -195,7 +196,7 @@ int FindPath(const int nStartX, const int nStartY,
         openSet.pop();
         closedVector.push_back(currentNode);
         auto currentNeighbors =
-            getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
+        getNeighbors(currentNode, pMap, inputMap, nMapWidth, nOutBufferSize);
         
         for (auto& neighbor : currentNeighbors) {
             if (vectorContains(closedVector, neighbor))
