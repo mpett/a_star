@@ -111,8 +111,10 @@ bool queueContains(std::priority_queue<Node> nodeQueue, const Node& possibleNode
 }
 
 std::vector<int> reconstructPath(std::unordered_map<int, int>& cameFrom,
-                                 const int goalNodeIndex, const int startNodeIndex) {
+                                 const int goalNodeIndex, const int startNodeIndex,
+                                 const int vectorSize) {
     std::vector<int> totalPath;
+    totalPath.reserve(vectorSize);
     int nodeIndex = goalNodeIndex;
     totalPath.push_back(goalNodeIndex);
     while (true) {
@@ -177,7 +179,8 @@ int FindPath(const int nStartX, const int nStartY,
         if (currentNode.hasEqualCoordinates(goalNode)) {
             int currentNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
             int startNodeIndex = nStartY * nMapWidth + nStartX;
-            auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex);
+            auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex,
+                                             nOutBufferSize);
             outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             int pathSize = (int) totalPath.size();
             std::reverse(totalPath.begin(), totalPath.end());
