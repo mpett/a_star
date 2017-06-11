@@ -9,6 +9,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <queue>
+#include <algorithm>
+#include <mutex>
 
 struct Node {
     int xPosition;
@@ -227,3 +229,4 @@ int main(int argc, const char * argv[]) {
     std::cout << "lol" << std::endl;
     return result;
 }
+
