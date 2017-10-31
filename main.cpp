@@ -111,10 +111,9 @@ bool queueContains(std::priority_queue<Node> nodeQueue, const Node& possibleNode
 }
 
 std::vector<int> reconstructPath(std::unordered_map<int, int>& cameFrom,
-                                 const int goalNodeIndex, const int startNodeIndex,
-                                 const int vectorSize) {
+                                 const int goalNodeIndex, const int startNodeIndex, const int bufferSize) {
     std::vector<int> totalPath;
-    totalPath.reserve(vectorSize);
+    totalPath.reserve(bufferSize+1);
     int nodeIndex = goalNodeIndex;
     totalPath.push_back(goalNodeIndex);
     while (true) {
@@ -179,9 +178,8 @@ int FindPath(const int nStartX, const int nStartY,
         if (currentNode.hasEqualCoordinates(goalNode)) {
             int currentNodeIndex = currentNode.yPosition * nMapWidth + currentNode.xPosition;
             int startNodeIndex = nStartY * nMapWidth + nStartX;
-            auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex,
-                                             nOutBufferSize);
-            outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
+            auto totalPath = reconstructPath(cameFrom, currentNodeIndex, startNodeIndex, nOutBufferSize);
+            //outputMapAndPath(totalPath, pMap, nMapWidth, nMapHeight);
             int pathSize = (int) totalPath.size();
             std::reverse(totalPath.begin(), totalPath.end());
             std::mutex mtx;
@@ -224,14 +222,3 @@ int FindPath(const int nStartX, const int nStartY,
     
     return -1;
 }
-
-int main(int argc, const char * argv[]) {
-    unsigned char pMap[] = {1, 1, 1, 1,
-                            0, 1, 0, 1,
-                            0, 1, 1, 1};
-    int pOutBuffer[12];
-    int result = FindPath(0, 0, 1, 2, pMap, 4, 3, pOutBuffer, 12);
-    std::cout << "lol" << std::endl;
-    return result;
-}
-
